@@ -1,0 +1,176 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+
+/**********************************************************
+
+	input for this program is taken from input.txt file
+
+**********************************************************/
+
+
+int main() {
+	//open input file - input.txt
+	ifstream fin("input.txt");
+
+	if (fin) {
+		vector<string> keywords;
+		vector<string> punctuation;
+		vector<string> operators;
+		vector<string> identifiers;
+		vector<string> literals;
+		vector<string> comments;
+		vector<string> undefined;
+
+		string word = "";
+		char c = ' ';
+
+		//loop until end of file
+		c = fin.get();
+		while (c != '$') {
+
+
+			//ignore whitespace
+			if (!isspace(c)) {
+				word = "";
+
+				//character is letter - token can be keyword or identifier
+				if (isalpha(c)) {
+					word += c;
+					c = fin.peek();
+					while (isalnum(c) || c == '_') {
+						c = fin.get();
+						word += c;
+						c = fin.peek();
+					}
+
+					//token is keyword
+					if (word == "def" || word == "fed" || word == "print" || word == "input" || word == "return") {
+						//add to list if token has not already been added
+						if (find(keywords.begin(), keywords.end(), word) == keywords.end()) {
+							keywords.push_back(word);
+						}
+					}
+					//token is identifier
+					else {
+						//add to list if token has not already been added
+						if (find(identifiers.begin(), identifiers.end(), word) == identifiers.end()) {
+							identifiers.push_back(word);
+						}
+					}
+				} 
+				//character is digit - token must be literal
+				else if (isdigit(c)) {
+					word += c;
+					c = fin.peek();
+					while (isdigit(c)) {
+						c = fin.get();
+						word += c;
+						c = fin.peek();
+					}
+					//add to list if token has not already been added
+					if (find(literals.begin(), literals.end(), word) == literals.end()) {
+						literals.push_back(word);
+					}
+				} 
+				//character is ! - token must be comment
+				else if (c == '!') {
+					word += c;
+					c = fin.get();
+					while (c != '\n') {
+						word += c;
+						c = fin.get();
+					}
+					//add to list if token has not already been added
+					if (find(comments.begin(), comments.end(), word) == comments.end()) {
+						comments.push_back(word);
+					}
+				}
+				//character is punctuation
+				else if (c == '(' || c == ')' || c == ':' || c == ';' || c == ',') {
+					word += c;
+					//add to list if token has not already been added
+					if (find(punctuation.begin(), punctuation.end(), word) == punctuation.end()) {
+						punctuation.push_back(word);
+					}
+				}
+				//character is operator
+				else if (c == '=' || c == '+' || c == '-' || c == '*' || c == '/') {
+					word += c;
+					//add to list if token has not already been added
+					if (find(operators.begin(), operators.end(), word) == operators.end()) {
+						operators.push_back(word);
+					}
+				}
+				//character is undefined
+				else {
+					word += c;
+					undefined.push_back(word);
+				}
+			}
+			c = fin.get();
+		}
+
+		cout << "Keywords: ";
+		if (!keywords.empty()) {
+			unsigned int i;
+			for (i = 0; i < keywords.size() - 1; i++)
+				cout << keywords.at(i) << ", ";
+			cout << keywords.at(i);
+		}
+
+		cout << "\nIdentifiers: ";
+		if (!identifiers.empty()) {
+			unsigned int i;
+			for (i = 0; i < identifiers.size() - 1; i++)
+				cout << identifiers.at(i) << ", ";
+			cout << identifiers.at(i);
+		}
+
+		cout << "\nPunctuation Elements: ";
+		if (!punctuation.empty()) {
+			for (unsigned int i = 0; i < punctuation.size(); i++)
+				cout << punctuation.at(i) << " ";
+		}
+
+		cout << "\nOperators: ";
+		if (!operators.empty()) {
+			for (unsigned int i = 0; i < operators.size(); i++)
+				cout << operators.at(i) << " ";
+		}
+
+		cout << "\nLiterals: ";
+		if (!literals.empty()) {
+			unsigned int i;
+			for (i = 0; i < literals.size() - 1; i++)
+				cout << literals.at(i) << ", ";
+			cout << literals.at(i);
+		}
+
+		cout << "\nComments: ";
+		if (!comments.empty()) {
+			unsigned int i;
+			for (i = 0; i < comments.size() - 1; i++)
+				cout << comments.at(i) << ", ";
+			cout << comments.at(i);
+		}
+
+		if (!undefined.empty()) {
+			cout << "\nUndefined Tokens: ";
+			unsigned int i;
+			for (i = 0; i < undefined.size() - 1; i++)
+				cout << undefined.at(i) << ", ";
+			cout << undefined.at(i);
+		}
+
+		cout << "\n\n\n";
+	}
+	else
+		cout << "The file could not be opened.\n";
+
+	return 0;
+}
